@@ -1,0 +1,21 @@
+<component name="libraryTable">
+  <library name="GOPATH &lt;api&gt;">
+    <CLASSES>
+      <root url="file://$PROJECT_DIR$/../../../xxd2_tx/tx/server/src/lms_client" />
+      <root url="file://$PROJECT_DIR$/../../../xxd2_tx/tx/server/src/code.google.com" />
+      <root url="file://$PROJECT_DIR$/../../../xxd2_tx/tx/server/src/labix.org" />
+      <root url="file://$PROJECT_DIR$/../../../xxd2_tx/tx/server/src/lms" />
+      <root url="file://$PROJECT_DIR$/../../../xxd2_tx/tx/server/src/github.com" />
+    </CLASSES>
+    <SOURCES>
+      <root url="file://$PROJECT_DIR$/../../../xxd2_tx/tx/server/src/lms_client" />
+      <root url="file://$PROJECT_DIR$/../../../xxd2_tx/tx/server/src/code.google.com" />
+      <root url="file://$PROJECT_DIR$/../../../xxd2_tx/tx/server/src/labix.org" />
+      <root url="file://$PROJECT_DIR$/../../../xxd2_tx/tx/server/src/lms" />
+      <root url="file://$PROJECT_DIR$/../../../xxd2_tx/tx/server/src/github.com" />
+    </SOURCES>
+    <excluded>
+      <root url="file://$PROJECT_DIR$" />
+    </excluded>
+  </library>
+</component>
