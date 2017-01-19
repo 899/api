@@ -31,7 +31,7 @@ func (ctx *Context) Fatal(msg string, err error) {
 	if err!=nil {
 		log.Printf("%s %s %s %s", ctx.request.Method, ctx.request.RequestURI, msg, err.Error())
 	}else{
-		log.Printf("%s %s %s", ctx.request.Method, ctx.request.RequestUri,msg)
+		log.Printf("%s %s %s", ctx.request.Method, ctx.request.RequestURI,msg)
 	}
 	http.Error(ctx.response, `{"error":"}`+msg+`"}`, 500)
 	panic(apiFatalErr)
@@ -48,7 +48,7 @@ func APIHandler(logic func(ctx *Context) APIResult) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		defer func() {
 			if err := recover(); err != nil && err != apiFatalErr {
-				log.Printf("%s PANIC! - %v", r.RequestURI, err)
+				log.Printf("%s PANIC!! - %v", r.RequestURI, err)
 				http.Error(w, `{"error":"Internal error"}`, 500)
 			}
 		}()
@@ -57,9 +57,9 @@ func APIHandler(logic func(ctx *Context) APIResult) http.Handler {
 
 		result := logic(&ctx)
 
-		data,err := json.Marshal(result)
+		data, err := json.Marshal(result)
 		if err != nil {
-			ctx.Fatal("json marshal failed", fmt.Errorf("%v, %s",r ,err))
+			ctx.Fatal("JSON marshal failed", fmt.Errorf("%v, %s", r, err))
 		}
 		ctx.response.Write(data)
 	})

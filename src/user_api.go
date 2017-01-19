@@ -4,13 +4,15 @@ import (
 	"time"
 	"fmt"
 	"context"
+	"net/http"
+	jwt "github.com/dgrijalva/jwt-go"
 )
 
 type UserAPI struct {
 }
 
-func (app *App) newUserAPI() *HelperAPI {
-	return UserAPI{}
+func (app *App) newUserAPI() *UserAPI {
+	return &UserAPI{}
 }
 
 type Key int
@@ -22,7 +24,23 @@ type Claims struct {
 	jwt.StandardClaims
 }
 
-func (api *UserAPI) setToken(res http.ResponseWriter, req *http.Request) {
+func (api *UserAPI) Name() string {
+	return "user"
+}
+
+func (api *UserAPI) Dispose() {
+}
+
+func (api *UserAPI) Export() APIMethods {
+	return APIMethods{
+		"settoken": api.setToken,
+		"logout": api.logout,
+	}
+}
+
+func (api *UserAPI) setToken(ctx *Context) APIResult {
+	res := ctx.response
+	//req := ctx.request
 	expireToken := time.Now().Add(time.Hour * 1).Unix()
 	expireCookie := time.Now().Add(time.Hour * 1)
 
@@ -41,7 +59,10 @@ func (api *UserAPI) setToken(res http.ResponseWriter, req *http.Request) {
 	cookie := http.Cookie{Name: "Auth", Value: signedToken, Expires: expireCookie, HttpOnly: true}
 	http.SetCookie(res, &cookie)
 
-	http.Redirect(res, req, "/profile", 307)
+	//http.Redirect(res, req, "/profile", 307)
+	return APIResult{
+		"result": true,
+	}
 }
 
 func (api *UserAPI) validate(page http.HandlerFunc) http.HandlerFunc {
@@ -83,8 +104,11 @@ func (api *UserAPI) protectedProfile(res http.ResponseWriter, req *http.Request)
 	fmt.Fprintf(res, "Hello %s", claims.Username)
 }
 
-func (api *UserAPI) logout(res http.ResponseWriter, req *http.Request) {
+func (api *UserAPI) logout(ctx *Context) APIResult {
+	res := ctx.response
 	deleteCookie := http.Cookie{Name: "Auth", Value: "none", Expires: time.Now()}
 	http.SetCookie(res, &deleteCookie)
-	return
+	return APIResult{
+		"result":true,
+	}
 }
