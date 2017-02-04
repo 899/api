@@ -9,21 +9,22 @@ func (app *App) newHelperAPI() *HelperAPI {
 	return &HelperAPI{}
 }
 
+func (api *HelperAPI) Dispose() {
+}
+
 func (api *HelperAPI) Name() string {
 	return "helper"
 }
 
-func (api *HelperAPI) Dispose() {
-}
-
 func (api *HelperAPI) Export() APIMethods {
 	return APIMethods{
-		"now": api.now,
+		"test": api.Test,
 	}
 }
 
-func (api *HelperAPI) now(ctx *Context) APIResult {
+func (api *HelperAPI) Test(ctx *Context) APIResult {
 	return APIResult{
 		"time": time.Now().UTC().Unix(),
+		"result": "help api test",
 	}
 }

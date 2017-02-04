@@ -13,6 +13,7 @@ type App struct {
 
 func NewApp() *App {
 	app := &App{}
+	// modules
 	app.modules = []APIModule{
 		app.newHelperAPI(),
 		app.newUserAPI(),
@@ -22,10 +23,13 @@ func NewApp() *App {
 }
 
 func (app *App) ListenAndServe(){
+
+	// setting
 	addr := ":9000"
 
 	mux := http.NewServeMux()
 
+	// route bind
 	for _,module := range app.modules {
 		methods := module.Export()
 		for path, function := range methods {

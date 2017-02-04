@@ -24,28 +24,41 @@ type Claims struct {
 	jwt.StandardClaims
 }
 
+func (api *UserAPI) Dispose() {
+}
+
 func (api *UserAPI) Name() string {
 	return "user"
 }
 
-func (api *UserAPI) Dispose() {
-}
-
 func (api *UserAPI) Export() APIMethods {
 	return APIMethods{
-		"settoken": api.setToken,
+		"login": api.login,
 		"logout": api.logout,
+		"test": api.test,
+		"index": api.index,
+		"refresh": api.refreshToken,
 	}
 }
 
-func (api *UserAPI) setToken(ctx *Context) APIResult {
+
+func (api *UserAPI) test(ctx *Context) APIResult {
+	//return APIResult{
+	//	"result": "user api test",
+	//}
+	obj := HelperAPI{}
+	res := obj.Test(ctx)
+	return  res
+}
+
+func (api *UserAPI) setToken(ctx *Context) {
 	res := ctx.response
 	//req := ctx.request
 	expireToken := time.Now().Add(time.Hour * 1).Unix()
 	expireCookie := time.Now().Add(time.Hour * 1)
 
 	claims := Claims{
-		"myusername",
+		"username",
 		jwt.StandardClaims{
 			ExpiresAt: expireToken,
 			Issuer:    "localhost:9000",
@@ -54,18 +67,14 @@ func (api *UserAPI) setToken(ctx *Context) APIResult {
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
-	signedToken, _ := token.SignedString([]byte("secret"))
+	signedToken, _ := token.SignedString([]byte("secret_key123456"))
 
 	cookie := http.Cookie{Name: "Auth", Value: signedToken, Expires: expireCookie, HttpOnly: true}
 	http.SetCookie(res, &cookie)
 
-	//http.Redirect(res, req, "/profile", 307)
-	return APIResult{
-		"result": true,
-	}
 }
 
-func (api *UserAPI) validate(page http.HandlerFunc) http.HandlerFunc {
+func (api *UserAPI) validateToken(page http.HandlerFunc) http.HandlerFunc {
 	return http.HandlerFunc(func(res http.ResponseWriter, req *http.Request) {
 		cookie, err := req.Cookie("Auth")
 		if err != nil {
@@ -94,14 +103,36 @@ func (api *UserAPI) validate(page http.HandlerFunc) http.HandlerFunc {
 	})
 }
 
-func (api *UserAPI) protectedProfile(res http.ResponseWriter, req *http.Request) {
-	claims, ok := req.Context().Value(MyKey).(Claims)
-	if !ok {
-		http.NotFound(res, req)
-		return
+func (api *UserAPI) login(ctx *Context) APIResult{
+	api.setToken(ctx)
+	//http.Redirect(ctx.response, ctx.request, "index", 307)
+	return APIResult{
+		"result":true,
 	}
+}
 
-	fmt.Fprintf(res, "Hello %s", claims.Username)
+func (api *UserAPI) refreshToken(ctx *Context) APIResult {
+	api.setToken(ctx)
+	return APIResult{
+		"result":true,
+	}
+}
+
+func (api *UserAPI) index(ctx *Context) APIResult {
+	//res :=ctx.response
+	//req :=ctx.request
+	//claims, ok := req.Context().Value(MyKey).(Claims)
+	//if !ok {
+	//	http.NotFound(res, req)
+	//	return APIResult{}
+	//}
+
+	//fmt.Fprintf(res, "Hello %s", claims.Username)
+
+	return APIResult{
+		"result": true,
+		"info": "hello index",
+	}
 }
 
 func (api *UserAPI) logout(ctx *Context) APIResult {
