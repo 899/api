@@ -20,14 +20,14 @@ func (api *UserAPI) Name() string {
 	return "user"
 }
 
-func (api *UserAPI) Export() APIMethods {
-	return AppRegister(
+func (api *UserAPI) Export() RegisterMethods {
+	return AppBootstrap(
 		RegisterMethods{
-			"login":RegisterMethod{api.login,false},
-			"test":RegisterMethod{api.Test,true},
-			"logout":RegisterMethod{api.logout,true},
-			"index":RegisterMethod{api.index,true},
-			"refresh":RegisterMethod{api.refreshToken,true},
+			"login":RegisterMethod{api.login,Bootstrap{false}},
+			"test":RegisterMethod{api.Test,Bootstrap{true}},
+			"logout":RegisterMethod{api.logout,Bootstrap{true}},
+			"index":RegisterMethod{api.index,Bootstrap{true}},
+			"refresh":RegisterMethod{api.refreshToken,Bootstrap{true}},
 		})
 }
 
@@ -40,12 +40,12 @@ type MyClaims struct {
 
 
 func (api *UserAPI) Test(ctx *Context) APIResult {
-	//return APIResult{
-	//	"result": "user api test",
-	//}
-	obj := HelperAPI{}
-	res := obj.Test(ctx)
-	return  res
+	return APIResult{
+		"result": "user api test",
+	}
+	//obj := HelperAPI{}
+	//res := obj.Test(ctx)
+	//return  res
 }
 
 func (api *UserAPI) setToken(ctx *Context) {

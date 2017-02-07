@@ -15,7 +15,7 @@ func NewApp() *App {
 	app := &App{}
 	// modules
 	app.modules = []APIModule{
-		app.newHelperAPI(),
+		//app.newHelperAPI(),
 		app.newUserAPI(),
 	}
 
@@ -31,10 +31,10 @@ func (app *App) ListenAndServe(){
 
 	// route bind
 	for _,module := range app.modules {
-		methods := module.Export()
-		for path, function := range methods {
+		registers := module.Export()
+		for path, register := range registers {
 			path = fmt.Sprintf("/%s/%s/%s", API_VERSION, module.Name(),path)
-			mux.Handle(path,APIHandler(function))
+			mux.Handle(path,APIHandler(register.method,register.bootstrap))
 		}
 	}
 

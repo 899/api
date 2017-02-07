@@ -16,10 +16,11 @@ func (api *HelperAPI) Name() string {
 	return "helper"
 }
 
-func (api *HelperAPI) Export() APIMethods {
-	return APIMethods{
-		"test": api.Test,
-	}
+func (api *HelperAPI) Export() RegisterMethods {
+	return AppBootstrap(
+		RegisterMethods{
+			"test":RegisterMethod{api.Test,Bootstrap{false}},
+		})
 }
 
 func (api *HelperAPI) Test(ctx *Context) APIResult {

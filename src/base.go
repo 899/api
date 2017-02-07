@@ -19,11 +19,9 @@ type Context struct {
 
 type APIResult map[string]interface{}
 
-type APIMethods map[string]func(*Context) APIResult
-
 type APIModule interface {
 	Name() string
-	Export() APIMethods
+	Export() RegisterMethods
 	Dispose()
 }
 
@@ -46,7 +44,7 @@ func (ctx *Context) Get(name string) string {
 	return ctx.query[name][0]
 }
 
-func APIHandler(logic func(ctx *Context) APIResult) http.Handler {
+func APIHandler(logic func(ctx *Context) APIResult,bootstrap Bootstrap) http.Handler {
 	return http.HandlerFunc(func(res http.ResponseWriter, req *http.Request) {
 		defer func() {
 			if err := recover(); err != nil && err != apiFatalErr {
@@ -57,7 +55,7 @@ func APIHandler(logic func(ctx *Context) APIResult) http.Handler {
 		ctx := Context{response: res, request: req}
 
 		// logic
-		result := logic(&ctx)
+		result := CtxBootstrap(logic,ctx, bootstrap)
 		data, err := json.Marshal(result)
 		if err != nil {
 			ctx.Fatal("JSON marshal failed", fmt.Errorf("%v, %s", req, err))
@@ -69,22 +67,25 @@ func APIHandler(logic func(ctx *Context) APIResult) http.Handler {
 
 type RegisterMethod struct {
 	method func(*Context) APIResult
+	bootstrap Bootstrap
+}
+type Bootstrap struct{
 	isValid bool
 }
 
 type RegisterMethods map[string]RegisterMethod
 
-func AppRegister(registers RegisterMethods) APIMethods {
-	apiMethods := APIMethods{}
+func AppBootstrap(registers RegisterMethods) RegisterMethods {
+	// register config
+	return registers
+}
 
-	for path,register := range registers{
-		if register.isValid {
-			//JwtTokenValid()
-		}
-		apiMethods[path] = register.method
+func CtxBootstrap(logic func(ctx *Context) APIResult,ctx Context,bootstrap Bootstrap) APIResult{
+	if bootstrap.isValid {
+		JwtTokenValid(ctx.response,ctx.request)
 	}
-	return apiMethods
-
+	result := logic(&ctx)
+	return result
 }
 func JwtTokenValid(res http.ResponseWriter,req *http.Request){
 	ctx := Context{response: res, request: req}
